@@ -1,4 +1,4 @@
-echo "Cleaning NYC Datasets..."
+echo "Cleaning Industry Dataset..."
 cd
 cd ana_code/etl_code/cleanNYCDatasets
 
