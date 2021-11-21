@@ -13,9 +13,17 @@ public class CleanIndustryMapper extends Mapper<LongWritable, Text, Text, IntWri
     public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
 
         String[] eachRecord = value.toString().split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
-
-        if (eachRecord[0].contains("All industries") | eachRecord[0].contains("Date") | eachRecord[0].contains("it / computing / software") | eachRecord[0].contains("marketing / advertising / pr") | eachRecord[0].contains("retail / wholesale")) {
-            context.write(new Text(outputKey), new IntWritable(1));
+        if (eachRecord.length >= 100) {
+            if (eachRecord[0].contains("All industries") | eachRecord[0].contains("Date") | eachRecord[0].contains("it / computing / software") | eachRecord[0].contains("marketing / advertising / pr") | eachRecord[0].contains("retail / wholesale")) {
+                String output = "";
+                for (int i = 0, j = 100; i < j; i++) {
+                    output += eachRecord[i];
+                    output += ",";
+                }
+                context.write(new Text(output), new IntWritable(1));
+            }
+           
+           
         }
     }
 }
