@@ -1,0 +1,29 @@
+The Following is the Survey With Hive
+Note. I decided to run each command individually rather than
+write a script since it was just overall easier and more
+mallable to work with.
+
+# Creates the initial table
+CREATE EXTERNAL TABLE hiveSurveyData(borough STRING, neighborhood STRING, address STRING, zipCode STRING, commercialUnits INT, totalUnits INT, yearBuilt INT, salePrice Int, saleDate STRING) ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' LOCATION '/user/emb689/ana_code/etl_results/cleanNYCResults';
+
+# Populates the table with the concat. results from ALL boroughs
+load data inpath 'hdfs://horton.hpc.nyu.edu:8020/user/emb689/ana_code/etl_results/cleanNYCResults/fullNYCSales.csv' into table hiveNYCSales;
+
+# Gets the number of rows
+select count(*) as totalRecords from hivenycsales;
+
+# Gets the max price by boroughs
+select borough, max(saleprice) as maxPriceInDollars from hivenycsales Group By borough;
+
+# Gets Avg Price in thosuands of dollars (with KNOWN selling prices)
+select borough, ROUND(avg(saleprice / 1000), 0) as AvgSalePriceInThousanddollars from hivenycsales where saleprice > 0  Group By borough;
+
+# Shows purchases over time
+SELECT borough, saleprice, CAST(TO_DATE(from_unixtime(UNIX_TIMESTAMP(saledate,'MM/dd/yy'))) as timestamp) as saletime FROM hivenycsales WHERE saleprice > 0 ORDER BY saletime;
+
+# Shows purchases month over month avg
+SELECT 
+date_format(CAST(TO_DATE(from_unixtime(UNIX_TIMESTAMP(saledate,'MM/dd/yy'))) as timestamp),'yyyy-MM') AS month, 
+ROUND(AVG(saleprice / 1000), 0) as AvgSalePriceInThousanddollars
+FROM hivenycsales WHERE saleprice > 0
+GROUP BY date_format(CAST(TO_DATE(from_unixtime(UNIX_TIMESTAMP(saledate,'MM/dd/yy'))) as timestamp),'yyyy-MM')
