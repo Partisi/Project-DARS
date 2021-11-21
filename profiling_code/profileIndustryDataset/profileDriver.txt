@@ -1,0 +1,5 @@
+For the Industry Dataset, there is no profiling needed.
+I am going to be working with this dataset to have visuals that
+support my hypothesis and my research.
+
+The industry dataset just needed to be cleaned and dropped with some columns.
