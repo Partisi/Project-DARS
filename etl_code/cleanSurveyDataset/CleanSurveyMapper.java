@@ -14,6 +14,7 @@ public class CleanSurveyMapper extends Mapper<LongWritable, Text, Text, IntWrita
 
         String[] eachRecord = value.toString().split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
 
+        //  "Well Being, Productivity, Boredom, Office Setup, Office Communication, Loneliness, Age, Gender"
         if (!value.toString().contains("StartDate")) {
             if (eachRecord.length >= 260) {
                 Text outputKey = new Text(eachRecord[20] + "," + eachRecord[25] + "," + eachRecord[48] + ","
@@ -22,10 +23,6 @@ public class CleanSurveyMapper extends Mapper<LongWritable, Text, Text, IntWrita
                 context.write(new Text(outputKey), new IntWritable(1));
             }
 
-        } else {
-            context.write(new Text(
-                    "Well Being, Productivity, Boredom, Office Setup, Office Communication, Loneliness, Age, Gender"),
-                    new IntWritable(1));
         }
 
     }

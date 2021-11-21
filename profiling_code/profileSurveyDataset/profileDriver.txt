@@ -4,26 +4,21 @@ write a script since it was just overall easier and more
 mallable to work with.
 
 # Creates the initial table
-CREATE EXTERNAL TABLE hiveSurveyData(borough STRING, neighborhood STRING, address STRING, zipCode STRING, commercialUnits INT, totalUnits INT, yearBuilt INT, salePrice Int, saleDate STRING) ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' LOCATION '/user/emb689/ana_code/etl_results/cleanNYCResults';
+CREATE EXTERNAL TABLE hiveSurveydata(wellbeing INT, productivity INT, boredom INT, officesetup INT, officeCommunication INT, loneliness INT, age INT, gender INT) ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' LOCATION '/user/emb689/ana_code/etl_results';
 
 # Populates the table with the concat. results from ALL boroughs
-load data inpath 'hdfs://horton.hpc.nyu.edu:8020/user/emb689/ana_code/etl_results/cleanNYCResults/fullNYCSales.csv' into table hiveNYCSales;
+load data inpath 'hdfs://horton.hpc.nyu.edu:8020/user/emb689/ana_code/etl_results/cleanSurveyResults/cleanSurveyData.csv' into table hiveSurveydata;
 
 # Gets the number of rows
-select count(*) as totalRecords from hivenycsales;
+select count(*) as totalRecords from hiveSurveydata;
 
-# Gets the max price by boroughs
-select borough, max(saleprice) as maxPriceInDollars from hivenycsales Group By borough;
-
-# Gets Avg Price in thosuands of dollars (with KNOWN selling prices)
-select borough, ROUND(avg(saleprice / 1000), 0) as AvgSalePriceInThousanddollars from hivenycsales where saleprice > 0  Group By borough;
-
-# Shows purchases over time
-SELECT borough, saleprice, CAST(TO_DATE(from_unixtime(UNIX_TIMESTAMP(saledate,'MM/dd/yy'))) as timestamp) as saletime FROM hivenycsales WHERE saleprice > 0 ORDER BY saletime;
-
-# Shows purchases month over month avg
-SELECT 
-date_format(CAST(TO_DATE(from_unixtime(UNIX_TIMESTAMP(saledate,'MM/dd/yy'))) as timestamp),'yyyy-MM') AS month, 
-ROUND(AVG(saleprice / 1000), 0) as AvgSalePriceInThousanddollars
-FROM hivenycsales WHERE saleprice > 0
-GROUP BY date_format(CAST(TO_DATE(from_unixtime(UNIX_TIMESTAMP(saledate,'MM/dd/yy'))) as timestamp),'yyyy-MM')
+# Gets the Avg for each
+select 
+ROUND(avg(wellbeing), 2) as AvgWellBeing, 
+ROUND(avg(productivity), 2) as AvgProductivity,
+ROUND(avg(boredom), 2) as AvgBoredom,
+ROUND(avg(officesetup), 2) as AvgOfficeSetup,
+ROUND(avg(officeCommunication), 2) as AvgOfficeCommunication,
+ROUND(avg(loneliness), 2) as AvgLoneliness,
+ROUND(avg(age), 2) as AvgAge
+from hiveSurveyData;
